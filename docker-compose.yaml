@@ -1,59 +1,40 @@
 version: '3.8'
 
 services:
-  # Go приложение
   go_app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: rococo44/go_app:latest
     container_name: go_app
     ports:
-      - "8080:8080"  # Публикуем порт 8080
-    volumes:
-      - ./app.log:/app/app.log  # Монтируем лог файл для Filebeat
+      - "8080:8080"
     networks:
       - app_network
+    environment:
+      - LOKI_URL=http://loki:3100
 
-  # Prometheus
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - /Users/aanlebedev/BAREbuXxX_1337/prometheus.yaml:/etc/prometheus/prometheus.yaml
     ports:
-      - "9090:9090"  # Публикуем порт Prometheus
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
     networks:
       - app_network
 
-  # Filebeat
-  filebeat:
-    image: elastic/filebeat:8.7.0
-    container_name: filebeat
-    volumes:
-      - ./filebeat.yml:/etc/filebeat/filebeat.yml
-      - ./app.log:/app/app.log  # Монтируем файл логов из Go приложения
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
     networks:
       - app_network
 
-  # Elasticsearch
-  elasticsearch:
-    image: elasticsearch:8.17.1
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
     ports:
-      - "9200:9200"  # Публикуем порт Elasticsearch
-    networks:
-      - app_network
-
-  # Kibana
-  kibana:
-    image: kibana:8.17.1
-    container_name: kibana
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-    ports:
-      - "5601:5601"  # Публикуем порт Kibana
+      - "3000:3000"
     networks:
       - app_network
 

@@ -1,19 +1,20 @@
 package Cache
 
 import (
+	"barebuXxX_1337/logger"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sirupsen/logrus"
 	"math/rand"
+	"strconv"
 	"time"
 )
 
 type Cache struct {
 	users          map[int64]string
 	cacheLenMetric prometheus.Gauge
-	logger         *logrus.Logger
+	logger         *logger.LokiLogger
 }
 
-func New(cacheLenMetric prometheus.Gauge, log *logrus.Logger) *Cache {
+func New(cacheLenMetric prometheus.Gauge, log *logger.LokiLogger) *Cache {
 	return &Cache{
 		users:          make(map[int64]string),
 		cacheLenMetric: cacheLenMetric,
@@ -32,9 +33,7 @@ func (c *Cache) UpdateCache() {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 	for range ticker.C {
-		c.logger.WithFields(logrus.Fields{
-			"size": len(c.users),
-		}).Infoln("Updating cache")
+		c.logger.Log("Update cache "+strconv.Itoa(len(c.users)), "info")
 		c.getUsersAndWriteToCache()
 	}
 }
