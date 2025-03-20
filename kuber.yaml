@@ -133,6 +133,8 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+      nodePort: 31500
+  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment

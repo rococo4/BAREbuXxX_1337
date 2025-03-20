@@ -5,5 +5,5 @@ import (
 )
 
 func InitMetrics() {
-	prometheus.MustRegister(RequestCounter, CacheLen)
+	prometheus.MustRegister(RequestCounter, CacheLen, HttpDuration)
 }
